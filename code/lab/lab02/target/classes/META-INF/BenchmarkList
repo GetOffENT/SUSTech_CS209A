@@ -1,0 +1,4 @@
+JMH S 15 task1.Practice2 S 47 task1.jmh_generated.Practice2_testarray_jmhTest S 9 testarray S 10 Throughput E A 1 1 1 E E E E E E E E E E E E E E U 11 NANOSECONDS E E 
+JMH S 15 task1.Practice2 S 51 task1.jmh_generated.Practice2_testarraylist_jmhTest S 13 testarraylist S 10 Throughput E A 1 1 1 E E E E E E E E E E E E E E U 11 NANOSECONDS E E 
+JMH S 15 task1.Practice2 S 48 task1.jmh_generated.Practice2_testintmap_jmhTest S 10 testintmap S 10 Throughput E A 1 1 1 E E E E E E E E E E E E E E U 11 NANOSECONDS E E 
+JMH S 15 task1.Practice2 S 52 task1.jmh_generated.Practice2_testlinkedlist_jmhTest S 14 testlinkedlist S 10 Throughput E A 1 1 1 E E E E E E E E E E E E E E U 11 NANOSECONDS E E 

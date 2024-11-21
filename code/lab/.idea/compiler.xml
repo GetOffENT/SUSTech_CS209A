@@ -8,6 +8,9 @@
         <outputRelativeToContentRoot value="true" />
         <module name="lab02" />
         <module name="lab01" />
+        <module name="lab09-task2" />
+        <module name="lab10" />
+        <module name="lab09" />
         <module name="lab08" />
         <module name="lab07" />
         <module name="lab06" />

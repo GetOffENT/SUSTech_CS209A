@@ -5,14 +5,18 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.Button?>
 
-<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.demo.Controller">
+<?import javafx.scene.layout.Pane?>
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.demo.Controller">
     <HBox spacing="10" alignment="CENTER">
-        <Label text="Score: " />
-        <Label fx:id="scoreLabel" text="0" />
+        <Label text="Score: "/>
+        <Label fx:id="scoreLabel" text="0"/>
     </HBox>
 
-    <GridPane fx:id="gameBoard" VBox.vgrow="ALWAYS" hgap="5" vgap="5">
-    </GridPane>
+    <Pane fx:id="gamePane" VBox.vgrow="ALWAYS">
+        <GridPane fx:id="gameBoard" VBox.vgrow="ALWAYS" hgap="5" vgap="5">
+        </GridPane>
+    </Pane>
 
     <HBox spacing="10" alignment="CENTER">
         <Button text="Reset" fx:id="resetButton" onAction="#handleReset"/>

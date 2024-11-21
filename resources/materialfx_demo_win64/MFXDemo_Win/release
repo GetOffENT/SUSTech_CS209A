@@ -1,0 +1,2 @@
+JAVA_VERSION="19.0.2"
+MODULES="java.base java.datatransfer java.xml java.prefs java.desktop javafx.base jdk.unsupported javafx.graphics javafx.controls java.scripting javafx.fxml mfx.localization mfx.core mfx.effects mfx.resources VirtualizedFX MaterialFX java.logging MaterialFX.merged.module fr.brouillard.oss.cssfx javafx.media jdk.localedata org.kordamp.ikonli.core org.kordamp.ikonli.fontawesome5 org.kordamp.ikonli.javafx java.instrument java.rmi jdk.internal.jvmstat jdk.attach org.scenicview.scenicview MaterialFX.Demo"

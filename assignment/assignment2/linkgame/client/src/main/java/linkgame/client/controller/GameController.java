@@ -1,4 +1,4 @@
-package linkgame.client;
+package linkgame.client.controller;
 
 import javafx.animation.*;
 import javafx.event.ActionEvent;
@@ -17,6 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polyline;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import linkgame.client.ClientService;
 import linkgame.common.Message;
 import linkgame.common.MessageType;
 import lombok.Getter;

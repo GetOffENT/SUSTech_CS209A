@@ -3,7 +3,7 @@
 <?import javafx.scene.layout.*?>
 
 <VBox xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="linkgame.client.InputController" alignment="CENTER" spacing="20"
+      fx:controller="linkgame.client.controller.InputController" alignment="CENTER" spacing="20"
       style="-fx-padding: 20; -fx-background-color: linear-gradient(to bottom, #f0f8ff, #87ceeb);">
     <!-- 标题 -->
     <Label text="您期望的棋盘大小" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333;" />

@@ -8,4 +8,6 @@ module org.example.demo {
 
     opens linkgame.client to javafx.fxml;
     exports linkgame.client;
+    exports linkgame.client.controller;
+    opens linkgame.client.controller to javafx.fxml;
 }

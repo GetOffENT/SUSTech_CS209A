@@ -1,0 +1,22 @@
+package linkgame.common;
+
+/**
+ * <p>
+ * </p>
+ *
+ * @author Yuxian Wu
+ * @version 1.0
+ * @since 2024-11-22 14:51
+ */
+public enum MessageType {
+    INIT,
+    WAIT,
+    PICK,
+    JUDGE,
+    LINE_SHOW,
+    LINE_DISAPPEAR,
+    FAIL,
+    TIMEOUT,
+    END,
+    DISCONNECTED
+}

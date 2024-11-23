@@ -124,14 +124,14 @@ public class Application extends javafx.application.Application {
                         errorLabel.setText("Rows must be >= 4.");
                         errorLabel.setVisible(true);
                         confirmButton.setDisable(true);
-                        return ;
+                        return;
                     } else if (rows % 2 == 0) {
                         rowValid = true;
                     } else {
                         errorLabel.setText("Rows must be even numbers >= 4.");
                         errorLabel.setVisible(true);
                         confirmButton.setDisable(true);
-                        return ;
+                        return;
                     }
                 }
 

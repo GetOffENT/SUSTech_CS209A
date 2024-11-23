@@ -1,10 +1,14 @@
 package linkgame.userserver.controller;
 
+import linkgame.userserver.entity.vo.UserVO;
 import linkgame.userserver.result.Result;
 import linkgame.userserver.entity.User;
 import linkgame.userserver.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
 
 /**
  * <p>
@@ -19,11 +23,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
+    // 所有已经登录的用户
+    private static final Set<Integer> users = new HashSet<>();
+
     private final UserService userService;
 
     @PostMapping("/login")
     public Result<User> login(@RequestParam String username, @RequestParam String password) {
-        return userService.login(username, password);
+        Result<User> loginUser = userService.login(username, password);
+        if (loginUser.getCode() == 200) {
+            users.add(loginUser.getData().getId());
+        }
+        return loginUser;
     }
 
     @PostMapping("/register")
@@ -31,5 +42,27 @@ public class UserController {
         return userService.register(user);
     }
 
+    @PostMapping("/logout")
+    public Result<Object> logout(@RequestParam Integer userId) {
+        users.remove(userId);
+        return Result.success();
+    }
 
+    /**
+     * 获取不包括自己的已登录用户列表
+     */
+    @PostMapping("/list")
+    public Result<List<UserVO>> list(@RequestParam Integer userId) {
+        List<User> list = userService.list();
+        list.removeIf(user -> user.getId().equals(userId));
+
+        List<UserVO> users = new ArrayList<>();
+        for (User user : list) {
+            UserVO userVO = new UserVO();
+            BeanUtils.copyProperties(user, userVO);
+            userVO.setOnline(UserController.users.contains(user.getId()));
+            users.add(userVO);
+        }
+        return Result.success(users);
+    }
 }

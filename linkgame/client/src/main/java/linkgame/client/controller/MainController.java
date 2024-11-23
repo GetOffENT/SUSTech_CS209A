@@ -5,10 +5,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import linkgame.client.ClientService;
+import linkgame.common.OkHttpUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * <p>
@@ -49,6 +51,8 @@ public class MainController {
             if (gameController != null && gameController.getClientService() != null) {
                 gameController.getClientService().close();
             }
+            OkHttpUtils.postForm("http://localhost:8080/user/logout",
+                    Map.of("userId", userId.toString()), null);
             System.exit(0);
         });
     }
@@ -123,6 +127,7 @@ public class MainController {
         this.nickname = nickname;
         this.avatar = avatar;
         mainPageController.setUserInfo(userId, nickname, avatar);
+        mainPageController.loadAllUsers();
         stage.setScene(mainPageScene);
         stage.setTitle("主页");
     }

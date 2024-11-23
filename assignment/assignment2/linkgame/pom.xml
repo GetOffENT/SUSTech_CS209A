@@ -13,5 +13,6 @@
         <module>server</module>
         <module>client</module>
         <module>common</module>
+        <module>user-server</module>
     </modules>
 </project>

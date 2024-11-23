@@ -56,6 +56,8 @@ public class GameServer {
 
         private boolean gameOver = false;
 
+        private String nickname, avatar;
+
         int[] boardSize;
 
         public ClientHandler(Socket socket) {
@@ -69,9 +71,12 @@ public class GameServer {
                 log.info("开始处理客户端：{}", clientId);
                 in = new ObjectInputStream(socket.getInputStream());
                 out = new ObjectOutputStream(socket.getOutputStream());
+                Map<?, ?> initMessage = (Map<?, ?>) in.readObject();
 
                 // 接收棋盘大小
-                boardSize = (int[]) in.readObject();
+                boardSize = (int[]) initMessage.get("boardSize");
+                nickname = (String) initMessage.get("nickname");
+                avatar = (String) initMessage.get("avatar");
                 log.info("{} 提供了棋盘大小：{}", clientId, Arrays.toString(boardSize));
 
                 // 客户端匹配逻辑
@@ -96,11 +101,17 @@ public class GameServer {
 
                         sendMessage(new Message(
                                 MessageType.INIT,
-                                Map.of("board", board, "turn", false)
+                                Map.of("board", board,
+                                        "turn", false,
+                                        "opponentNickname", opponent.nickname,
+                                        "opponentAvatar", opponent.avatar)
                         ));
                         opponent.sendMessage(new Message(
                                 MessageType.INIT,
-                                Map.of("board", board, "turn", true)
+                                Map.of("board", board,
+                                        "turn", true,
+                                        "opponentNickname", nickname,
+                                        "opponentAvatar", avatar)
                         ));
                         log.info("已向 {} 和 {} 发送初始化消息", clientId, opponent.clientId);
                     } else {

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="linkgame.client.controller.LoginController">
+    <TextField fx:id="usernameField" layoutX="50" layoutY="20" promptText="用户名" />
+    <PasswordField fx:id="passwordField" layoutX="50" layoutY="70" promptText="密码" />
+
+    <HBox fx:id="registerFields" layoutX="50" layoutY="120" spacing="10">
+        <TextField fx:id="nicknameField" promptText="昵称" />
+        <TextField fx:id="avatarUrlField" promptText="头像URL（可选）" />
+    </HBox>
+
+    <Button fx:id="loginOrRegisterButton" layoutX="50" layoutY="220" onAction="#handleLoginOrRegister" text="登录" />
+    <Button fx:id="toggleButton" layoutX="250" layoutY="220" onAction="#toggle" text="切换到注册" />
+
+</AnchorPane>

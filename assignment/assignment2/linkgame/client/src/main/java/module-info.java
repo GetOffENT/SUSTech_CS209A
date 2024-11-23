@@ -5,6 +5,7 @@ module org.example.demo {
     requires linkgame.common;
     requires lombok;
     requires slf4j.api;
+    requires fastjson;
 
     opens linkgame.client to javafx.fxml;
     exports linkgame.client;

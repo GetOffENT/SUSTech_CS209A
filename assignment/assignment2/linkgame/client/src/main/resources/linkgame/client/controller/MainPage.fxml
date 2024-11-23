@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="linkgame.client.controller.MainPageController">
+    <Label fx:id="usernameLabel" layoutX="50" layoutY="20"/>
+    <Label fx:id="nicknameLabel" layoutX="50" layoutY="60"/>
+    <Label fx:id="avatarLabel" layoutX="50" layoutY="100"/>
+
+    <Button fx:id="startGameButton" text="开始游戏" layoutX="50" layoutY="150" onAction="#handleStartGame"/>
+
+    <Button fx:id="exitGameButton" text="退出游戏" layoutX="150" layoutY="150" onAction="#handleExitGame"/>
+</AnchorPane>

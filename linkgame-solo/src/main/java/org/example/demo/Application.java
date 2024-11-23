@@ -32,7 +32,6 @@ public class Application extends javafx.application.Application {
         stage.setScene(scene);
         stage.show();
 
-        // TODO: handle the game logic
 
     }
 

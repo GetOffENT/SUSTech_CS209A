@@ -1,7 +1,5 @@
 package org.example.demo;
 
-import io.github.palexdev.materialfx.controls.MFXButton;
-import io.github.palexdev.materialfx.effects.DepthLevel;
 import javafx.application.Application;
 import javafx.scene.ImageCursor;
 import javafx.scene.Scene;
@@ -16,7 +14,7 @@ import java.util.Objects;
 /**
  * @author Yuxian Wu
  * @version 1.0
- * @Description: TODO
+ * @Description:
  * @Create: 2024-10-28 20:24
  */
 public class testFX extends Application {
@@ -24,16 +22,16 @@ public class testFX extends Application {
     public void start(Stage stage) throws Exception {
         Label label = new Label("Hello, JavaFX!");
         BorderPane pane = new BorderPane(label);
-        MFXButton button = new MFXButton("Click me!");
-        button.setRippleColor(Color.RED);
-        button.setDepthLevel(DepthLevel.LEVEL1);
-        pane.setCenter(button);
+//        MFXButton button = new MFXButton("Click me!");
+//        button.setRippleColor(Color.RED);
+//        button.setDepthLevel(DepthLevel.LEVEL1);
+//        pane.setCenter(button);
 
 
         Scene scene = new Scene(pane, 640, 480);
-        button.setOnAction(e ->{
-            getHostServices().showDocument("https://www.google.com");
-        });
+//        button.setOnAction(e ->{
+//            getHostServices().showDocument("https://www.google.com");
+//        });
 
         // 设置光标
         scene.setCursor(new ImageCursor(new Image(Objects.requireNonNull(testFX.class.getResource("/org/example/demo/cursor.png")).toExternalForm())));

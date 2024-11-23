@@ -2,13 +2,23 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="linkgame.client.controller.MainPageController">
+    <!-- 当前用户信息展示 -->
     <Label fx:id="usernameLabel" layoutX="50" layoutY="20"/>
     <Label fx:id="nicknameLabel" layoutX="50" layoutY="60"/>
-    <Label fx:id="avatarLabel" layoutX="50" layoutY="100"/>
+
+    <!-- 当前用户头像展示 -->
+    <ImageView fx:id="currentUserAvatarImageView" layoutX="200" layoutY="20" fitHeight="50" fitWidth="50"/>
+
+    <!-- 用户列表显示区域 -->
+    <VBox fx:id="usersContainer" layoutX="50" layoutY="200" spacing="10">
+        <!-- 动态添加用户 -->
+    </VBox>
+
 
     <Button fx:id="startGameButton" text="开始游戏" layoutX="50" layoutY="150" onAction="#handleStartGame"/>
-
     <Button fx:id="exitGameButton" text="退出游戏" layoutX="150" layoutY="150" onAction="#handleExitGame"/>
+
 </AnchorPane>

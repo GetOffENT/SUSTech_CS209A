@@ -69,16 +69,22 @@ public class GameController {
     }
 
     /**
+     * 设置用户昵称
+     */
+    public void setYourNickname(String nickname) {
+        yourNickname.setText(nickname);
+    }
+
+    public void setOpponentNickname(String nickname) {
+        opponentNickname.setText(nickname);
+    }
+
+    /**
      * 显示回合进度条
      */
     public void showYourProgress(boolean isVisible) {
         yourProgressBar.setVisible(isVisible);
         opponentProgressBar.setVisible(!isVisible);
-    }
-
-    public void showOpponentProgress(boolean isVisible) {
-        opponentProgressBar.setVisible(isVisible);
-        yourProgressBar.setVisible(!isVisible);
     }
 
     public void updateYourProgress(double progress) {
@@ -212,11 +218,20 @@ public class GameController {
     }
 
     public void connectToServer(int rows, int cols) {
-        clientService.connectToServer("localhost", 12345, rows, cols, message -> {
+        clientService.connectToServer("localhost", 12345, rows, cols, mainController.getNickname(), mainController.getAvatar(), message -> {
             if (message.getType() == MessageType.INIT) {
                 int[][] board = (int[][]) message.getData().get("board");
+
+                // 匹配成功，初始化游戏界面
+                String opponentNickname = (String) message.getData().get("opponentNickname");
+                String opponentAvatar = (String) message.getData().get("opponentAvatar");
                 updateYourScore(0);
                 updateOpponentScore(0);
+                setYourNickname(mainController.getNickname());
+                setOpponentNickname(opponentNickname);
+                setYourAvatar(new Image(mainController.getAvatar()));
+                setOpponentAvatar(new Image(opponentAvatar));
+
                 mainController.showGamePage(board);
                 isYourTurn = (boolean) message.getData().get("turn");
                 showInformMessage(isYourTurn ? "匹配成功! 你先手" : "匹配成功! 对手先手");

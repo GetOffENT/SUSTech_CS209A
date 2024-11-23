@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -31,7 +32,7 @@ public class ClientService {
     /**
      * 连接服务器
      */
-    public void connectToServer(String host, int port, int rows, int cols, Consumer<Message> messageHandler) {
+    public void connectToServer(String host, int port, int rows, int cols, String nickname, String avatar, Consumer<Message> messageHandler) {
         new Thread(() -> {
             try {
                 socket = new Socket(host, port);
@@ -39,7 +40,13 @@ public class ClientService {
                 in = new ObjectInputStream(socket.getInputStream());
                 isConnected = true;
 
-                out.writeObject(new int[]{rows, cols});
+//                out.writeObject(new int[]{rows, cols});
+                out.writeObject(
+                        Map.of(
+                                "boardSize", new int[]{rows, cols},
+                                "nickname", nickname,
+                                "avatar", avatar)
+                );
                 out.flush();
                 log.info("已发送棋盘大小至服务器: rows={}, cols={}", rows, cols);
 

@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import linkgame.client.ClientService;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -19,14 +20,24 @@ import java.io.IOException;
  */
 @Slf4j
 public class MainController {
+    @Getter
+    private Integer userId;
+    @Getter
+    private String nickname;
+    @Getter
+    private String avatar;
+
     private Stage stage;
 
     private Parent inputRoot;
     private Parent waitingRoot;
     private Parent gameRoot;
+    private Parent mainPageRoot;
 
     private InputController inputController;
     private GameController gameController;
+    private MainPageController mainPageController;
+    private LoginController loginController;
 
 
     public MainController(Stage stage) {
@@ -45,9 +56,27 @@ public class MainController {
     private Scene inputScene;
     private Scene waitingScene;
     private Scene gameScene;
+    private Scene mainPageScene;
+    private Scene loginScene;
 
     private void preloadControllers() {
         try {
+
+            // 预加载 LoginController
+            FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("LoginPage.fxml"));
+            Parent loginRoot = loginLoader.load();
+            loginController = loginLoader.getController();
+            loginController.setMainController(this);
+            loginScene = new Scene(loginRoot);
+
+            // 预加载 MainPageController
+            FXMLLoader mainPageLoader = new FXMLLoader(getClass().getResource("MainPage.fxml"));
+            mainPageRoot = mainPageLoader.load();
+            mainPageController = mainPageLoader.getController();
+            mainPageController.setMainController(this);
+            mainPageScene = new Scene(mainPageRoot);
+
+
             // 预加载 InputController
             FXMLLoader inputLoader = new FXMLLoader(getClass().getResource("InputPage.fxml"));
             inputRoot = inputLoader.load();
@@ -69,8 +98,12 @@ public class MainController {
             gameScene = new Scene(gameRoot);
 
             // 设置初始页面为输入页面
-            stage.setScene(inputScene);
-            stage.setTitle("Input Page");
+//            stage.setScene(inputScene);
+//            stage.setTitle("Input Page");
+//            stage.show();
+            // 设置初始页面为登录页面
+            stage.setScene(loginScene);
+            stage.setTitle("登录");
             stage.show();
 
             log.info("所有页面预加载完成");
@@ -78,6 +111,20 @@ public class MainController {
             log.error("预加载页面时发生错误：", e);
             throw new RuntimeException("页面预加载失败");
         }
+    }
+
+    public void showLoginPage() {
+        stage.setScene(loginScene);
+        stage.setTitle("登录");
+    }
+
+    public void showMainPage(int userId, String nickname, String avatar) {
+        this.userId = userId;
+        this.nickname = nickname;
+        this.avatar = avatar;
+        mainPageController.setUserInfo(userId, nickname, avatar);
+        stage.setScene(mainPageScene);
+        stage.setTitle("主页");
     }
 
     public void showInputPage() {

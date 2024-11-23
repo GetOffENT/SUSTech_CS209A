@@ -1,6 +1,7 @@
 package linkgame.client;
 
 import javafx.stage.Stage;
+import linkgame.client.controller.MainController;
 
 public class Application extends javafx.application.Application {
     @Override

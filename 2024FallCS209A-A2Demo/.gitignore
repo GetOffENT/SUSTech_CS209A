@@ -8,6 +8,7 @@ target/
 *.iws
 *.iml
 *.ipr
+*.client-backup/
 
 ### Eclipse ###
 .apt_generated

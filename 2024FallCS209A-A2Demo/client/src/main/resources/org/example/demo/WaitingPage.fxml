@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml"
+      alignment="CENTER" spacing="20" style="-fx-padding: 20; -fx-background-color: linear-gradient(to bottom, #ffffff, #d0e7ff);">
+    <!-- 标题 -->
+    <Label text="正在匹配对手中..." style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3c3c3c;" />
+
+    <!-- 进度指示器 -->
+    <ProgressIndicator style="-fx-progress-color: #4CAF50;" prefWidth="100" prefHeight="100" />
+
+    <!-- 提示文字 -->
+    <Label text="请稍候，匹配成功后将进入游戏" style="-fx-font-size: 16px; -fx-text-fill: #6b6b6b; -fx-padding: 10;" />
+</VBox>

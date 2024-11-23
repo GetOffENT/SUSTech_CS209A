@@ -1,6 +1,7 @@
-package org.example.demo;
+package linkgame;
 
 import javafx.scene.control.Button;
+import lombok.Getter;
 
 import java.util.Random;
 
@@ -15,7 +16,8 @@ public class Game {
     // board content
     int[][] board;
 
-    Button[] path;
+    @Getter
+    int[] path;
 
     public Game(int[][] board) {
         this.board = board;
@@ -27,18 +29,17 @@ public class Game {
     public static int[][] SetupBoard(int row, int col, boolean reset) {
         Random random = new Random();
 
-        if (!reset){
+        if (!reset) {
             row += 2;
             col += 2;
         }
 
-        // TODO: randomly initialize board
         int[][] board = new int[row][col];
 
         int totalPairs = (row - 2) * (col - 2) / 2;
         int[] icons = new int[totalPairs * 2];
         for (int i = 0; i < totalPairs; i++) {
-            icons[i * 2] = random.nextInt(1,12);
+            icons[i * 2] = random.nextInt(1, 12);
             icons[i * 2 + 1] = icons[i * 2];
         }
 
@@ -60,15 +61,20 @@ public class Game {
         return board;
     }
 
+    public static boolean hasValidPath(int[][] board) {
+
+        return false;
+    }
+
     // judge the validity of an operation
-    public boolean judge(int row1, int col1, int row2, int col2, Button[][] buttons) {
+    public boolean judge(int row1, int col1, int row2, int col2) {
         if ((board[row1][col1] != board[row2][col2]) || (row1 == row2 && col1 == col2)) {
             return false;
         }
 
         // one line
         if (isDirectlyConnected(row1, col1, row2, col2, board)) {
-            path = new Button[]{buttons[row1][col1], buttons[row2][col2]};
+            path = new int[]{row1, col1, row2, col2};
             return true;
         }
 
@@ -76,12 +82,12 @@ public class Game {
         if ((row1 != row2) && (col1 != col2)) {
             if (board[row1][col2] == 0 && isDirectlyConnected(row1, col1, row1, col2, board)
                     && isDirectlyConnected(row1, col2, row2, col2, board)) {
-                path = new Button[]{buttons[row1][col1], buttons[row1][col2], buttons[row2][col2]};
+                path = new int[]{row1, col1, row1, col2, row2, col2};
                 return true;
             }
             if (board[row2][col1] == 0 && isDirectlyConnected(row2, col2, row2, col1, board)
                     && isDirectlyConnected(row2, col1, row1, col1, board)) {
-                path = new Button[]{buttons[row1][col1], buttons[row2][col1], buttons[row2][col2]};
+                path = new int[]{row1, col1, row2, col1, row2, col2};
                 return true;
             }
         }
@@ -92,7 +98,7 @@ public class Game {
                 if (board[row1][i] == 0 && board[row2][i] == 0 &&
                         isDirectlyConnected(row1, col1, row1, i, board) && isDirectlyConnected(row1, i, row2, i, board)
                         && isDirectlyConnected(row2, col2, row2, i, board)) {
-                    path = new Button[]{buttons[row1][col1], buttons[row1][i], buttons[row2][i], buttons[row2][col2]};
+                    path = new int[]{row1, col1, row1, i, row2, i, row2, col2};
                     return true;
                 }
             }
@@ -101,7 +107,7 @@ public class Game {
                 if (board[j][col1] == 0 && board[j][col2] == 0 &&
                         isDirectlyConnected(row1, col1, j, col1, board) && isDirectlyConnected(j, col1, j, col2, board)
                         && isDirectlyConnected(row2, col2, j, col2, board)) {
-                    path = new Button[]{buttons[row1][col1], buttons[j][col1], buttons[j][col2], buttons[row2][col2]};
+                    path = new int[]{row1, col1, j, col1, j, col2, row2, col2};
                     return true;
                 }
             }
@@ -133,4 +139,24 @@ public class Game {
         return false;
     }
 
+    // judge whether the game is over
+    public boolean isGameOver() {
+        // 判断还有没有可以连的线
+        for (int i = 1; i < row - 1; i++) {
+            for (int j = 1; j < col - 1; j++) {
+                if (board[i][j] != 0) {
+                    for (int k = 1; k < row - 1; k++) {
+                        for (int l = 1; l < col - 1; l++) {
+                            if (board[k][l] != 0) {
+                                if (judge(i, j, k, l)) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
 }

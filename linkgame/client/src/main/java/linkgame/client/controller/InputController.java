@@ -1,4 +1,4 @@
-package linkgame.client;
+package linkgame.client.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.Parent;

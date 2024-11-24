@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -29,5 +29,5 @@ public class RecordVO {
 
     private Integer opponentScore;
 
-    private Date createAt;
+    private LocalDateTime createAt;
 }

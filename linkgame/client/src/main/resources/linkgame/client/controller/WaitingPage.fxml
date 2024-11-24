@@ -3,6 +3,7 @@
 <?import javafx.scene.layout.*?>
 
 <VBox xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="linkgame.client.controller.WaitingController"
       alignment="CENTER" spacing="20" style="-fx-padding: 20; -fx-background-color: linear-gradient(to bottom, #ffffff, #d0e7ff);">
     <!-- 标题 -->
     <Label text="正在匹配对手中..." style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3c3c3c;" />
@@ -12,4 +13,7 @@
 
     <!-- 提示文字 -->
     <Label text="请稍候，匹配成功后将进入游戏" style="-fx-font-size: 16px; -fx-text-fill: #6b6b6b; -fx-padding: 10;" />
+
+    <!-- 返回按钮 -->
+    <Button text="返回" onAction="#backToMainPage" style="-fx-font-size: 16px;"/>
 </VBox>

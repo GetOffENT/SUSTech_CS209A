@@ -76,4 +76,21 @@ public class UserController {
 
         return Result.success(users);
     }
+
+    /**
+     * 根据用户id列表获取用户信息
+     */
+    @PostMapping("/listByIds")
+    public Result<List<UserVO>> listByIds(@RequestParam List<Integer> userIds) {
+        List<User> list = userService.listByIds(userIds);
+
+        List<UserVO> users = new ArrayList<>();
+        for (User user : list) {
+            UserVO userVO = new UserVO();
+            BeanUtils.copyProperties(user, userVO);
+            users.add(userVO);
+        }
+
+        return Result.success(users);
+    }
 }

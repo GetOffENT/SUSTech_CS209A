@@ -32,7 +32,7 @@
                 style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 5px; "/>
 
         <!-- 查看游戏历史按钮 -->
-        <Button fx:id="viewHistoryButton" text="查看游戏历史" onAction="#handleViewHistory"
+        <Button fx:id="viewHistoryButton" text="查看战绩" onAction="#handleViewHistory"
                 style="-fx-background-color: #1E88E5;-fx-text-fill: white; -fx-border-radius: 5px;"/>
 
         <!-- 退出登录按钮 -->

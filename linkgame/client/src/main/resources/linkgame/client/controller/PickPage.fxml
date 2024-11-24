@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="linkgame.client.controller.PickController"
+      alignment="CENTER" spacing="20"
+      style="-fx-padding: 20; -fx-background-color: linear-gradient(to bottom, #ffffff, #d0e7ff);">
+    <!-- 标题 -->
+    <Label text="挑选对手..." style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3c3c3c;"/>
+
+    <!-- 用户列表显示区域 -->
+    <VBox fx:id="usersContainer" spacing="10"/>
+
+    <!-- 提示文字 -->
+    <Label text="请挑选您的对手，或者等待其他人选择您"
+           style="-fx-font-size: 16px; -fx-text-fill: #6b6b6b; -fx-padding: 10;"/>
+
+    <!-- 返回按钮 -->
+    <Button text="返回" onAction="#backToMainPage" style="-fx-font-size: 16px;"/>
+</VBox>

@@ -218,7 +218,7 @@ public class GameController {
     }
 
     public void connectToServer(int rows, int cols) {
-        clientService.connectToServer("localhost", 12345, rows, cols, mainController.getNickname(), mainController.getAvatar(), message -> {
+        clientService.connectToServer("localhost", 12345, rows, cols, mainController.getUserId().toString(), mainController.getNickname(), mainController.getAvatar(), message -> {
             if (message.getType() == MessageType.INIT) {
                 int[][] board = (int[][]) message.getData().get("board");
 

@@ -3,22 +3,45 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="linkgame.client.controller.MainPageController">
-    <!-- 当前用户信息展示 -->
-    <Label fx:id="usernameLabel" layoutX="50" layoutY="20"/>
-    <Label fx:id="nicknameLabel" layoutX="50" layoutY="60"/>
-
-    <!-- 当前用户头像展示 -->
-    <ImageView fx:id="currentUserAvatarImageView" layoutX="200" layoutY="20" fitHeight="50" fitWidth="50"/>
-
-    <!-- 用户列表显示区域 -->
-    <VBox fx:id="usersContainer" layoutX="50" layoutY="200" spacing="10">
-        <!-- 动态添加用户 -->
+    <!-- 用户信息展示部分 -->
+    <VBox layoutX="50" layoutY="20" spacing="15" alignment="CENTER_LEFT">
+        <!-- 用户 ID 和昵称展示 -->
+        <Label fx:id="usernameLabel" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+        <Label fx:id="nicknameLabel" style="-fx-font-size: 14px; -fx-text-fill: #777;"/>
     </VBox>
 
+    <!-- 当前用户头像展示 -->
+    <ImageView fx:id="currentUserAvatarImageView" layoutX="250" layoutY="20" fitHeight="80" fitWidth="80"
+               style="-fx-border-radius: 40px; -fx-border-color: #ddd; -fx-border-width: 2px;"/>
 
-    <Button fx:id="startGameButton" text="开始游戏" layoutX="50" layoutY="150" onAction="#handleStartGame"/>
-    <Button fx:id="exitGameButton" text="退出游戏" layoutX="150" layoutY="150" onAction="#handleExitGame"/>
+    <Button fx:id="refreshButton" layoutX="10" layoutY="80" prefHeight="20" prefWidth="20" onAction="#handleRefresh"/>
+
+    <!-- 用户列表显示区域 -->
+    <ScrollPane layoutX="50" layoutY="80" fitToWidth="true" fitToHeight="true"
+                prefWidth="350" prefHeight="300" maxHeight="300" style="-fx-background-color: transparent; -fx-border-width: 0;">
+        <VBox fx:id="usersContainer" spacing="10" alignment="CENTER_LEFT"/>
+    </ScrollPane>
+
+    <!-- 按钮区域 -->
+    <HBox layoutX="10" layoutY="350" spacing="10" alignment="CENTER" prefWidth="400" minHeight="100">
+        <!-- 开始游戏按钮 -->
+        <Button fx:id="startGameButton" text="开始游戏" onAction="#handleStartGame"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 5px; "/>
+
+        <!-- 查看游戏历史按钮 -->
+        <Button fx:id="viewHistoryButton" text="查看游戏历史" onAction="#handleViewHistory"
+                style="-fx-background-color: #1E88E5;-fx-text-fill: white; -fx-border-radius: 5px;"/>
+
+        <!-- 退出登录按钮 -->
+        <Button fx:id="logoutButton" text="退出登录" onAction="#handleLogout"
+                style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-border-radius: 5px;"/>
+
+        <!-- 退出游戏按钮 -->
+        <Button fx:id="exitGameButton" text="退出游戏" onAction="#handleExitGame"
+                style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-border-radius: 5px;"/>
+    </HBox>
 
 </AnchorPane>

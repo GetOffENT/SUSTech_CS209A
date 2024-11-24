@@ -1,5 +1,6 @@
 package linkgame.userserver.entity.vo;
 
+import linkgame.userserver.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,9 +21,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecordVO {
-    private UserVO user;
+    private User user;
 
-    private UserVO opponent;
+    private User opponent;
 
     private Integer score;
 

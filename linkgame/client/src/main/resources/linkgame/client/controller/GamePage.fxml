@@ -33,7 +33,7 @@
         </VBox>
     </HBox>
     <StackPane fx:id="gamePane" VBox.vgrow="ALWAYS">
-        <GridPane fx:id="gameBoard" VBox.vgrow="ALWAYS" hgap="5" vgap="5">
+        <GridPane fx:id="gameBoard" VBox.vgrow="ALWAYS" hgap="5" vgap="5" alignment="CENTER">
         </GridPane>
     </StackPane>
     <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10;">

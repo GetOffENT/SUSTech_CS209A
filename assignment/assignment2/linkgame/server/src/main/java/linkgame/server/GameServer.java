@@ -2,6 +2,7 @@ package linkgame.server;
 
 import linkgame.common.Message;
 import linkgame.common.MessageType;
+import linkgame.common.OkHttpUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -56,7 +57,7 @@ public class GameServer {
 
         private boolean gameOver = false;
 
-        private String nickname, avatar;
+        private String userId, nickname, avatar;
 
         int[] boardSize;
 
@@ -73,7 +74,8 @@ public class GameServer {
                 out = new ObjectOutputStream(socket.getOutputStream());
                 Map<?, ?> initMessage = (Map<?, ?>) in.readObject();
 
-                // 接收棋盘大小
+                // 接收棋初始化信息
+                userId = (String) initMessage.get("userId");
                 boardSize = (int[]) initMessage.get("boardSize");
                 nickname = (String) initMessage.get("nickname");
                 avatar = (String) initMessage.get("avatar");
@@ -169,6 +171,7 @@ public class GameServer {
                                 log.info("已向 {} 和 {} 发送游戏结束消息", clientId, opponent.clientId);
                                 gameOver = true;
                                 opponent.gameOver = true;
+                                sendRecord();
                             }
                         } else if (message.getType() == MessageType.TIMEOUT) {
                             Message m = new Message(MessageType.TIMEOUT, null);
@@ -191,6 +194,24 @@ public class GameServer {
             } finally {
                 close();
             }
+        }
+
+        private void sendRecord() {
+
+            Map<String, String> record = Map.of(
+                    "userId", userId,
+                    "opponentId", opponent.userId,
+                    "score", score.toString(),
+                    "opponentScore", opponent.score.toString(),
+                    "createAt", new Date().toString()
+            );
+
+            OkHttpUtils.postForm(
+                    "http://localhost:8080/record",
+                    record,
+                    null
+            );
+            log.info("已向发送游戏记录 {}", record);
         }
 
         private void notifyOpponentDisconnected() {

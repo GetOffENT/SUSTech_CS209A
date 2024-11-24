@@ -51,8 +51,10 @@ public class MainController {
             if (gameController != null && gameController.getClientService() != null) {
                 gameController.getClientService().close();
             }
-            OkHttpUtils.postForm("http://localhost:8080/user/logout",
-                    Map.of("userId", userId.toString()), null);
+            if (userId != null) {
+                OkHttpUtils.postForm("http://localhost:8080/user/logout",
+                        Map.of("userId", userId.toString()), null);
+            }
             System.exit(0);
         });
     }
@@ -118,6 +120,7 @@ public class MainController {
     }
 
     public void showLoginPage() {
+        loginController.init();
         stage.setScene(loginScene);
         stage.setTitle("登录");
     }

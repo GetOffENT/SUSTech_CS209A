@@ -12,7 +12,7 @@ CREATE TABLE `user`
     `username` varchar(255) NOT NULL,
     `password` varchar(255) NOT NULL,
     `nickname` varchar(255) NOT NULL,
-    `avatar`   varchar(255) NOT NULL DEFAULT 'https://sky-www9989.oss-cn-shenzhen.aliyuncs.com/wukong.jpg',
+    `avatar`   varchar(1000) NOT NULL DEFAULT 'https://sky-www9989.oss-cn-shenzhen.aliyuncs.com/wukong.jpg',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1

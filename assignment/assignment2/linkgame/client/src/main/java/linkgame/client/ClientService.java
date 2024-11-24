@@ -32,7 +32,12 @@ public class ClientService {
     /**
      * 连接服务器
      */
-    public void connectToServer(String host, int port, int rows, int cols, String nickname, String avatar, Consumer<Message> messageHandler) {
+    public void connectToServer(
+            String host, int port,
+            int rows, int cols,
+            String userId, String nickname, String avatar,
+            Consumer<Message> messageHandler
+    ) {
         new Thread(() -> {
             try {
                 socket = new Socket(host, port);
@@ -44,6 +49,7 @@ public class ClientService {
                 out.writeObject(
                         Map.of(
                                 "boardSize", new int[]{rows, cols},
+                                "userId", userId,
                                 "nickname", nickname,
                                 "avatar", avatar)
                 );

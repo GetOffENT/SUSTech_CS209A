@@ -46,6 +46,20 @@ public class LoginController {
     @FXML
     public void initialize() {
         registerFields.setVisible(false);
+        usernameField.setText("");
+        passwordField.setText("");
+        nicknameField.setText("");
+        avatarUrlField.setText("");
+    }
+
+    public void init() {
+        registerFields.setVisible(false);
+        usernameField.setText("");
+        passwordField.setText("");
+        nicknameField.setText("");
+        avatarUrlField.setText("");
+        toggleButton.setText("切换到注册");
+        loginOrRegisterButton.setText("登录");
     }
 
     /**
@@ -121,7 +135,7 @@ public class LoginController {
                 Map.of("username", username,
                         "password", password,
                         "nickname", nickname,
-                        "avatarUrl", avatarUrl),
+                        "avatar", avatarUrl),
                 null);
 
         JSONObject jsonObject = JSON.parseObject(response);

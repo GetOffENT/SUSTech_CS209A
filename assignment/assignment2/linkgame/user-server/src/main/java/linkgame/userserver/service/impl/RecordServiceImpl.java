@@ -3,7 +3,6 @@ package linkgame.userserver.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import linkgame.userserver.entity.Record;
 import linkgame.userserver.entity.vo.RecordVO;
-import linkgame.userserver.entity.vo.UserVO;
 import linkgame.userserver.mapper.UserMapper;
 import linkgame.userserver.service.RecordService;
 import linkgame.userserver.mapper.RecordMapper;
@@ -36,14 +35,12 @@ public class RecordServiceImpl extends ServiceImpl<RecordMapper, Record>
         records.forEach(record -> {
             RecordVO recordVO = new RecordVO();
             BeanUtils.copyProperties(record, recordVO);
-            UserVO userVO = new UserVO();
-            BeanUtils.copyProperties(userMapper.selectById(record.getUserId()), UserVO.class);
-            recordVO.setUser(userVO);
-            UserVO opponentVO = new UserVO();
-            BeanUtils.copyProperties(userMapper.selectById(record.getOpponentId()), UserVO.class);
-            recordVO.setOpponent(opponentVO);
+            recordVO.setUser(userMapper.selectById(record.getUserId()).setPassword(null));
+            recordVO.setOpponent(userMapper.selectById(record.getOpponentId()).setPassword(null));
             recordVOList.add(recordVO);
         });
+
+        recordVOList.sort((o1, o2) -> o2.getCreateAt().compareTo(o1.getCreateAt()));
 
         return recordVOList;
     }

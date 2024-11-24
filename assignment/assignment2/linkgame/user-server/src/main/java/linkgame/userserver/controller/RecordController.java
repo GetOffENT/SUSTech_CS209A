@@ -5,12 +5,8 @@ import linkgame.userserver.entity.vo.RecordVO;
 import linkgame.userserver.result.Result;
 import linkgame.userserver.service.RecordService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,14 +24,21 @@ public class RecordController {
 
     private final RecordService recordService;
 
-    @PostMapping("/all")
+    @GetMapping
     public Result<List<RecordVO>> getUserRecords(@RequestParam Integer userId) {
         return Result.success(recordService.getUserRecords(userId));
     }
 
-    @PostMapping()
+    @PostMapping
     public Result<Boolean> addRecord(Record record) {
-        record.setCreateAt(new Date());
-        return Result.success(recordService.save(record));
+        recordService.save(record);
+        Record recordOpponent = new Record();
+        recordOpponent.setUserId(record.getOpponentId());
+        recordOpponent.setOpponentId(record.getUserId());
+        recordOpponent.setScore(record.getOpponentScore());
+        recordOpponent.setOpponentScore(record.getScore());
+        recordOpponent.setCreateAt(record.getCreateAt());
+        recordService.save(recordOpponent);
+        return Result.success();
     }
 }

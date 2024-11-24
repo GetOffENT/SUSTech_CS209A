@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -18,18 +19,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import linkgame.common.OkHttpUtils;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TimeZone;
 
 /**
  * <p>
@@ -371,6 +367,7 @@ public class MainPageController {
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("历史记录");
 
+        ScrollPane scrollPane = new ScrollPane();
         VBox vbox = new VBox(10);
         vbox.setPrefWidth(400);
         vbox.setStyle("-fx-padding: 10; -fx-background-color: #f0f0f0;");
@@ -382,7 +379,10 @@ public class MainPageController {
             vbox.getChildren().add(recordBox);
         }
 
-        Scene dialogScene = new Scene(vbox);
+        scrollPane.setContent(vbox);
+        scrollPane.setFitToWidth(true);
+
+        Scene dialogScene = new Scene(scrollPane, 400, 500);
         dialog.setScene(dialogScene);
         dialog.show();
     }

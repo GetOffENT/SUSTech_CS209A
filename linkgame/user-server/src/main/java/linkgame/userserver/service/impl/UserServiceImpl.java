@@ -9,6 +9,8 @@ import linkgame.userserver.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 /**
 * @author W
 * @description 针对表【user】的数据库操作Service实现
@@ -22,7 +24,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private final UserMapper userMapper;
 
     @Override
-    public Result<User> login(String username, String password) {
+    public Result<User> login(String username, String password, Set<Integer> users) {
         User user = userMapper.selectOne(
                 new LambdaQueryWrapper<User>()
                         .eq(User::getUsername, username)
@@ -34,6 +36,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         if (!user.getPassword().equals(password)) {
             return Result.error("密码错误");
+        }
+
+        if (users.contains(user.getId())) {
+            return Result.error("用户已登录");
         }
 
         return Result.success(user);

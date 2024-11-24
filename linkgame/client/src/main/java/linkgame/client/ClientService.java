@@ -5,6 +5,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import linkgame.common.Message;
+import linkgame.common.MessageType;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,7 +38,7 @@ public class ClientService {
      */
     public void connectToServer(
             String host, int port,
-            int rows, int cols, boolean isRandom,
+            int rows, int cols, boolean isRandom, boolean isReconnect,
             String userId, String nickname, String avatar,
             Consumer<Message> messageHandler
     ) {
@@ -50,12 +51,15 @@ public class ClientService {
 
 //                out.writeObject(new int[]{rows, cols});
                 out.writeObject(
-                        Map.of(
-                                "boardSize", new int[]{rows, cols},
-                                "isRandom", isRandom,
-                                "userId", userId,
-                                "nickname", nickname,
-                                "avatar", avatar)
+                        new Message(
+                                isReconnect ? MessageType.RECONNECT : MessageType.INIT,
+                                Map.of(
+                                        "boardSize", new int[]{rows, cols},
+                                        "isRandom", isRandom,
+                                        "userId", userId,
+                                        "nickname", nickname,
+                                        "avatar", avatar)
+                        )
                 );
                 out.flush();
                 log.info("已发送棋盘大小至服务器: rows={}, cols={}", rows, cols);

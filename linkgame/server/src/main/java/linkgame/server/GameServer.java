@@ -9,9 +9,6 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,6 +29,9 @@ public class GameServer {
     private static final Queue<ClientHandler> waitingClients = new LinkedList<>();
     private static final Map<String, ClientHandler> pickingClients = new HashMap<>();
     private static final String DISCONNECTION_LOG_FILE = "disconnection.log";
+
+    // 自己的ID, 对手的ClientHandler 仅记录异常断开的情况
+    private static final Map<String, ClientHandler> errorClients = new HashMap<>();
 
     public static void main(String[] args) {
         log.info("游戏服务器正在运行，监听端口：{}", PORT);
@@ -55,13 +55,13 @@ public class GameServer {
 
         private Game sharedGame;
 
-        private String clientId;
+        private final String clientId;
 
         private Integer score = 0;
 
-        private boolean gameOver = false;
+        private Integer opponentScore = 0;
 
-        private boolean normalClose = false;
+        private boolean gameOver = false;
 
         private String userId, nickname, avatar;
 
@@ -80,19 +80,30 @@ public class GameServer {
                 out = new ObjectOutputStream(socket.getOutputStream());
 
                 // 接收棋初始化信息
-                Map<?, ?> initMessage = (Map<?, ?>) in.readObject();
-                userId = (String) initMessage.get("userId");
-                boardSize = (int[]) initMessage.get("boardSize");
-                nickname = (String) initMessage.get("nickname");
-                avatar = (String) initMessage.get("avatar");
-                boolean isRandom = (boolean) initMessage.get("isRandom");
-                log.info("{} 提供了棋盘大小：{}", clientId, Arrays.toString(boardSize));
+                Message initMessage = (Message) in.readObject();
+                userId = (String) initMessage.getData().get("userId");
+                nickname = (String) initMessage.getData().get("nickname");
+                avatar = (String) initMessage.getData().get("avatar");
 
-                if (isRandom) {
-                    handleRandomStart();
-                } else {
-                    handlePickStart();
+                if (initMessage.getType() == MessageType.INIT) {
+                    log.info("{} 提供了棋盘大小：{}", clientId, Arrays.toString(boardSize));
+                    boardSize = (int[]) initMessage.getData().get("boardSize");
+                    boolean isRandom = (boolean) initMessage.getData().get("isRandom");
+                    if (isRandom) {
+                        handleRandomStart();
+                    } else {
+                        handlePickStart();
+                    }
+                } else if (initMessage.getType() == MessageType.RECONNECT) {
+                    log.info("{} 用户：{}请求重连", clientId, userId);
+                    if (errorClients.containsKey(userId)) {
+                        handleReconnect();
+                    } else {
+                        sendMessage(new Message(MessageType.RECONNECT_FAIL, null));
+                        log.error("{} 无可重连对象", clientId);
+                    }
                 }
+
 
                 // 游戏交互逻辑
                 while (true) {
@@ -116,6 +127,10 @@ public class GameServer {
                             sendMessage(m);
                             opponent.sendMessage(m);
                             log.info("已向 {} 和 {} 发送超时消息", clientId, opponent.clientId);
+                        } else if (message.getType() == MessageType.WAIT_RECONNECT_FAIL) {
+                            synchronized (errorClients) {
+                                errorClients.remove(userId);
+                            }
                         }
                     } else {
                         log.warn("{} 尚未匹配到对手", clientId);
@@ -131,6 +146,32 @@ public class GameServer {
                 notifyOpponentDisconnected(); // 通知对手断开连接
             } finally {
                 close();
+            }
+        }
+
+        private void handleReconnect() throws IOException {
+
+            opponent = errorClients.get(userId);
+            this.sharedGame = opponent.sharedGame;
+            this.score = opponent.opponentScore;
+            this.opponentScore = opponent.score;
+            opponent.opponent = this;
+
+            sendMessage(new Message(
+                    MessageType.RECONNECT,
+                    Map.of("board", sharedGame.board,
+                            "score", score,
+                            "opponentScore", opponentScore,
+                            "opponentNickname", opponent.nickname,
+                            "opponentAvatar", opponent.avatar
+                            )
+            ));
+            opponent.sendMessage(new Message(
+                    MessageType.RECONNECT,
+                    null
+            ));
+            synchronized (errorClients) {
+                errorClients.remove(userId);
             }
         }
 
@@ -259,7 +300,9 @@ public class GameServer {
         private void notifyOpponentDisconnected() {
             if (opponent != null && !gameOver) {
                 try {
-                    opponent.sendMessage(new Message(MessageType.DISCONNECTED, Map.of("message", "您的对手掉线啦!")));
+                    opponent.sendMessage(new Message(MessageType.WAIT_RECONNECT, null));
+                    errorClients.put(userId, opponent);
+                    this.opponent.opponentScore = this.score;
                     log.info("已通知 {} 的对手掉线", opponent.clientId);
                 } catch (IOException e) {
                     log.error("通知 {} 的对手掉线时发生错误：", opponent.clientId, e);
@@ -312,6 +355,8 @@ public class GameServer {
                 if (opponent.socket.isClosed()) {
                     assert socket != null;
                     if (socket.isClosed()) {
+                        errorClients.remove(userId);
+                        errorClients.remove(opponent.userId);
                         logBothClientsDisconnected(); // 记录双方都已断开连接的日志
                     }
                 }

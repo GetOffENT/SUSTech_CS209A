@@ -5,8 +5,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import linkgame.client.ClientService;
-import linkgame.common.Message;
-import linkgame.common.MessageType;
 import linkgame.common.OkHttpUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +30,7 @@ public class MainController {
     @Getter
     private String avatar;
 
+    @Getter
     private Stage stage;
 
     private Parent inputRoot;
@@ -136,6 +135,7 @@ public class MainController {
     }
 
     public void showMainPage() {
+        mainPageController.loadAllUsers();
         stage.setScene(mainPageScene);
         stage.setTitle("主页");
     }
@@ -145,9 +145,9 @@ public class MainController {
         this.nickname = nickname;
         this.avatar = avatar;
         mainPageController.setUserInfo(userId, nickname, avatar);
-        mainPageController.loadAllUsers();
-        stage.setScene(mainPageScene);
-        stage.setTitle("主页");
+
+        // 切换到主页面之前尝试重连
+        reconnectToServer();
     }
 
     public void showInputPage() {
@@ -171,7 +171,11 @@ public class MainController {
     }
 
     public void connectToServer(int rows, int cols, boolean isRandom) {
-        gameController.connectToServer(rows, cols, isRandom);
+        gameController.connectToServer(rows, cols, isRandom, false);
+    }
+
+    public void reconnectToServer() {
+        gameController.connectToServer(0, 0, true, true);
     }
 
     public void connectToUser(String userId) {
@@ -183,7 +187,9 @@ public class MainController {
     }
 
     public void closeConnection() {
-        gameController.getClientService().setNormalClose(true);
-        gameController.getClientService().close();
+        if (gameController != null && gameController.getClientService() != null) {
+            gameController.getClientService().setNormalClose(true);
+            gameController.getClientService().close();
+        }
     }
 }

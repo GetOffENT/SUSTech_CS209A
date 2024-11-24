@@ -335,8 +335,9 @@ public class MainPageController {
 
     @FXML
     private void handleExitGame() {
-        Stage stage = (Stage) exitGameButton.getScene().getWindow();
-        stage.close();
+        OkHttpUtils.postForm("http://localhost:8080/user/logout",
+                Map.of("userId", mainController.getUserId().toString()), null);
+        mainController.getStage().close();
     }
 
     @FXML

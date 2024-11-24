@@ -18,7 +18,10 @@ public enum MessageType {
     FAIL,
     TIMEOUT,
     END,
-    DISCONNECTED,
     LIST,
-    PICK_OPPONENT
+    PICK_OPPONENT,
+    RECONNECT,
+    RECONNECT_FAIL,
+    WAIT_RECONNECT,
+    WAIT_RECONNECT_FAIL,
 }

@@ -30,7 +30,7 @@ public class UserController {
 
     @PostMapping("/login")
     public Result<User> login(@RequestParam String username, @RequestParam String password) {
-        Result<User> loginUser = userService.login(username, password);
+        Result<User> loginUser = userService.login(username, password, users);
         if (loginUser.getCode() == 200) {
             users.add(loginUser.getData().getId());
         }

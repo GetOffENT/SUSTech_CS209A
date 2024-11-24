@@ -770,25 +770,27 @@ public class GameController {
 
         reconnectDialog.getButtonTypes().setAll(restartButton, returnButton, exitButton);
 
-        if (!reconnectDialog.isShowing()) {
-            Optional<ButtonType> result = reconnectDialog.showAndWait();
-            if (result.isPresent() && result.get() == restartButton) {
-                mainController.closeConnection();
-                mainController.showInputPage();
+
+        Optional<ButtonType> result = reconnectDialog.showAndWait();
+        if (result.isPresent() && result.get() == restartButton) {
+            clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
+            isReconnecting = false;
+            mainController.closeConnection();
+            mainController.showInputPage();
+        } else if (result.isPresent() && result.get() == returnButton) {
+            clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
+            isReconnecting = false;
+            mainController.closeConnection();
+            mainController.showMainPage();
+        } else {
+            if (isReconnecting) {
                 clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
-            } else if (result.isPresent() && result.get() == returnButton) {
-                clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
-                isReconnecting = false;
                 mainController.closeConnection();
-                mainController.showMainPage();
-            } else {
-//                mainController.closeConnection();
-//                clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
-//                if (mainController.getUserId() != null) {
-//                    OkHttpUtils.postForm("http://localhost:8080/user/logout",
-//                            Map.of("userId", mainController.getUserId().toString()), null);
-//                }
-//                System.exit(0);
+                if (mainController.getUserId() != null) {
+                    OkHttpUtils.postForm("http://localhost:8080/user/logout",
+                            Map.of("userId", mainController.getUserId().toString()), null);
+                }
+                System.exit(0);
             }
         }
     }
@@ -803,10 +805,10 @@ public class GameController {
                     Platform.runLater(() -> countdownLabel.setText("剩余时间: " + countdownSeconds + "秒"));
                 }
                 if (isReconnecting) {
-                    isReconnecting = false;
                     clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
                     Platform.runLater(() -> {
                         {
+                            isReconnecting = false;
                             closeReconnectingDialog();
                             showDisconnectedDialog();
                         }

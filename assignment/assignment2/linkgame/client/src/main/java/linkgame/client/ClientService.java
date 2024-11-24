@@ -5,6 +5,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import linkgame.common.Message;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -28,13 +29,15 @@ public class ClientService {
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private boolean isConnected = false;
+    @Setter
+    private boolean normalClose = false;
 
     /**
      * 连接服务器
      */
     public void connectToServer(
             String host, int port,
-            int rows, int cols,
+            int rows, int cols, boolean isRandom,
             String userId, String nickname, String avatar,
             Consumer<Message> messageHandler
     ) {
@@ -49,6 +52,7 @@ public class ClientService {
                 out.writeObject(
                         Map.of(
                                 "boardSize", new int[]{rows, cols},
+                                "isRandom", isRandom,
                                 "userId", userId,
                                 "nickname", nickname,
                                 "avatar", avatar)
@@ -68,7 +72,9 @@ public class ClientService {
                         log.error("收到无法解析的消息: ", e);
                     } catch (IOException e) {
                         log.error("与服务器的连接中断: ", e);
-                        handleServerDisconnected();
+                        if (!normalClose) {
+                            handleServerDisconnected();
+                        }
                         break;
                     }
                 }

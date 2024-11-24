@@ -18,5 +18,7 @@ public enum MessageType {
     FAIL,
     TIMEOUT,
     END,
-    DISCONNECTED
+    DISCONNECTED,
+    LIST,
+    PICK_OPPONENT
 }

@@ -217,9 +217,30 @@ public class GameController {
         connectionLine.setVisible(true);
     }
 
-    public void connectToServer(int rows, int cols) {
-        clientService.connectToServer("localhost", 12345, rows, cols, mainController.getUserId().toString(), mainController.getNickname(), mainController.getAvatar(), message -> {
-            if (message.getType() == MessageType.INIT) {
+    public void connectToUser(String userId) {
+        log.info("连接到用户: {}", userId);
+        clientService.sendMessage(
+                new Message(MessageType.PICK_OPPONENT,
+                        Map.of("opponentId", userId)
+                )
+        );
+    }
+
+    public void connectToServer(int rows, int cols, boolean isRandom) {
+        log.info("连接到服务器: {}行 {}列", rows, cols);
+        clientService.connectToServer("localhost", 12345, rows, cols, isRandom, mainController.getUserId().toString(), mainController.getNickname(), mainController.getAvatar(), message -> {
+            if (message.getType() == MessageType.LIST) {
+                List<?> uncheckedUserIds = (List<?>) message.getData().get("userIds");
+                List<String> userIds = new ArrayList<>();
+                for (Object item : uncheckedUserIds) {
+                    if (item instanceof String) {
+                        userIds.add((String) item);  // 类型安全的转换
+                    } else {
+                        log.warn("非法的用户ID: {}", item);
+                    }
+                }
+                mainController.loadUsers(userIds);
+            } else if (message.getType() == MessageType.INIT) {
                 int[][] board = (int[][]) message.getData().get("board");
 
                 // 匹配成功，初始化游戏界面
@@ -232,7 +253,8 @@ public class GameController {
                 setYourAvatar(new Image(mainController.getAvatar()));
                 setOpponentAvatar(new Image(opponentAvatar));
 
-                mainController.showGamePage(board);
+                loadGameScene(board);
+                mainController.showGamePage();
                 isYourTurn = (boolean) message.getData().get("turn");
                 showInformMessage(isYourTurn ? "匹配成功! 你先手" : "匹配成功! 对手先手");
                 startTurnCountdown();
@@ -616,15 +638,17 @@ public class GameController {
 
         alert.getDialogPane().setContent(content);
 
-
         ButtonType playAgainButton = new ButtonType("再来一局", ButtonBar.ButtonData.OK_DONE);
+        ButtonType returnButton = new ButtonType("返回主页", ButtonBar.ButtonData.CANCEL_CLOSE);
         ButtonType exitButton = new ButtonType("退出游戏", ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().setAll(playAgainButton, exitButton);
+        alert.getButtonTypes().setAll(playAgainButton, returnButton, exitButton);
 
         alert.setOnCloseRequest(dialogEvent -> {
             ButtonType result = alert.getResult();
             if (result == playAgainButton) {
                 mainController.showInputPage();
+            } else if (result == returnButton) {
+                mainController.showMainPage();
             } else if (result == exitButton) {
                 clientService.close();
                 System.exit(0);

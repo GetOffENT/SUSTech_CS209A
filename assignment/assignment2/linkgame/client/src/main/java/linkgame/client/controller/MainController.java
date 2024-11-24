@@ -5,11 +5,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import linkgame.client.ClientService;
+import linkgame.common.Message;
+import linkgame.common.MessageType;
 import linkgame.common.OkHttpUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +40,7 @@ public class MainController {
     private Parent mainPageRoot;
 
     private InputController inputController;
+    private PickController pickController;
     private GameController gameController;
     private MainPageController mainPageController;
     private LoginController loginController;
@@ -64,6 +68,7 @@ public class MainController {
     private Scene gameScene;
     private Scene mainPageScene;
     private Scene loginScene;
+    private Scene pickScene;
 
     private void preloadControllers() {
         try {
@@ -90,9 +95,18 @@ public class MainController {
             inputController.setMainController(this);
             inputScene = new Scene(inputRoot);
 
-            // 预加载 WaitingPage
+            // 预加载 PickController
+            FXMLLoader pickLoader = new FXMLLoader(getClass().getResource("PickPage.fxml"));
+            Parent pickRoot = pickLoader.load();
+            pickController = pickLoader.getController();
+            pickController.setMainController(this);
+            pickScene = new Scene(pickRoot);
+
+            // 预加载 WaitingController
             FXMLLoader waitingLoader = new FXMLLoader(getClass().getResource("WaitingPage.fxml"));
             waitingRoot = waitingLoader.load();
+            WaitingController waitingController = waitingLoader.getController();
+            waitingController.setMainController(this);
             waitingScene = new Scene(waitingRoot);
 
             // 预加载 ClientController
@@ -103,10 +117,6 @@ public class MainController {
             gameController.setClientService(new ClientService());
             gameScene = new Scene(gameRoot);
 
-            // 设置初始页面为输入页面
-//            stage.setScene(inputScene);
-//            stage.setTitle("Input Page");
-//            stage.show();
             // 设置初始页面为登录页面
             stage.setScene(loginScene);
             stage.setTitle("登录");
@@ -125,6 +135,11 @@ public class MainController {
         stage.setTitle("登录");
     }
 
+    public void showMainPage() {
+        stage.setScene(mainPageScene);
+        stage.setTitle("主页");
+    }
+
     public void showMainPage(int userId, String nickname, String avatar) {
         this.userId = userId;
         this.nickname = nickname;
@@ -140,18 +155,35 @@ public class MainController {
         stage.setTitle("棋盘大小");
     }
 
+    public void showPickPage() {
+        stage.setScene(pickScene);
+        stage.setTitle("匹配中");
+    }
+
     public void showWaitingPage() {
         stage.setScene(waitingScene);
         stage.setTitle("匹配中");
     }
 
-    public void showGamePage(int[][] board) {
-        gameController.loadGameScene(board);
+    public void showGamePage() {
         stage.setScene(gameScene);
         stage.setTitle("连连看");
     }
 
-    public void connectToServer(int rows, int cols) {
-        gameController.connectToServer(rows, cols);
+    public void connectToServer(int rows, int cols, boolean isRandom) {
+        gameController.connectToServer(rows, cols, isRandom);
+    }
+
+    public void connectToUser(String userId) {
+        gameController.connectToUser(userId);
+    }
+
+    public void loadUsers(List<String> userIds) {
+        pickController.loadUsers(userIds);
+    }
+
+    public void closeConnection() {
+        gameController.getClientService().setNormalClose(true);
+        gameController.getClientService().close();
     }
 }

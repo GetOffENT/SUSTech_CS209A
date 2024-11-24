@@ -22,6 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -445,14 +449,13 @@ public class MainPageController {
 
     private String formatDate(String createAt) {
         try {
-            // 使用 SimpleDateFormat 解析和格式化时间
-            SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-            Date date = isoFormat.parse(createAt);
+            DateTimeFormatter isoFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            LocalDateTime localDateTime = LocalDateTime.parse(createAt, isoFormat);
 
-            // 格式化为自定义格式
-            SimpleDateFormat outputFormat = new SimpleDateFormat("MM月dd日 HH:mm");
-            outputFormat.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-            return outputFormat.format(date);
+            ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of("Asia/Shanghai"));
+
+            DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("MM月dd日 HH:mm");
+            return zonedDateTime.format(outputFormat);
         } catch (Exception e) {
             e.printStackTrace();
             return "未知时间";

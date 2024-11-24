@@ -1,6 +1,7 @@
 package linkgame.client.controller;
 
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -15,16 +16,19 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polyline;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import linkgame.client.ClientService;
 import linkgame.common.Message;
 import linkgame.common.MessageType;
+import linkgame.common.OkHttpUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
@@ -203,6 +207,7 @@ public class GameController {
         connectionLine.setVisible(false);
     }
 
+    // 显示连接线
     private void showConnectionLine(int[] path) {
         connectionLine.getPoints().clear();
 
@@ -226,20 +231,45 @@ public class GameController {
         );
     }
 
-    public void connectToServer(int rows, int cols, boolean isRandom) {
+    public void connectToServer(int rows, int cols, boolean isRandom, boolean isReconnect) {
         log.info("连接到服务器: {}行 {}列", rows, cols);
-        clientService.connectToServer("localhost", 12345, rows, cols, isRandom, mainController.getUserId().toString(), mainController.getNickname(), mainController.getAvatar(), message -> {
+        clientService.connectToServer("localhost", 12345, rows, cols, isRandom, isReconnect, mainController.getUserId().toString(), mainController.getNickname(), mainController.getAvatar(), message -> {
             if (message.getType() == MessageType.LIST) {
                 List<?> uncheckedUserIds = (List<?>) message.getData().get("userIds");
                 List<String> userIds = new ArrayList<>();
                 for (Object item : uncheckedUserIds) {
                     if (item instanceof String) {
-                        userIds.add((String) item);  // 类型安全的转换
+                        userIds.add((String) item);
                     } else {
                         log.warn("非法的用户ID: {}", item);
                     }
                 }
                 mainController.loadUsers(userIds);
+            } else if (message.getType() == MessageType.RECONNECT) {
+                isReconnecting = false;
+                if (message.getData() == null) {
+                    isYourTurn = true;
+                    reconnectDialog.close();
+                    showInformMessage("对手已重连!");
+                } else {
+                    isYourTurn = false;
+                    int[][] board = (int[][]) message.getData().get("board");
+                    updateOpponentScore((Integer) (message.getData().get("opponentScore")));
+                    setOpponentNickname((String) message.getData().get("opponentNickname"));
+                    setOpponentAvatar(new Image((String) message.getData().get("opponentAvatar")));
+
+                    updateYourScore((Integer) (message.getData().get("score")));
+                    setYourNickname(mainController.getNickname());
+                    setYourAvatar(new Image(mainController.getAvatar()));
+
+                    loadGameScene(board);
+                    mainController.showGamePage();
+                    showInformMessage("重连成功，对手回合!");
+                }
+                startTurnCountdown();
+            } else if (message.getType() == MessageType.RECONNECT_FAIL) {
+                mainController.closeConnection();
+                mainController.showMainPage();
             } else if (message.getType() == MessageType.INIT) {
                 int[][] board = (int[][]) message.getData().get("board");
 
@@ -311,8 +341,8 @@ public class GameController {
                 int opponentScore = (Integer) message.getData().get("opponentScore");
 
                 showGameOverDialog(yourScore, opponentScore);
-            } else if (message.getType() == MessageType.DISCONNECTED) {
-                showDisconnectedDialog();
+            } else if (message.getType() == MessageType.WAIT_RECONNECT) {
+                showReconnectDialog();
             }
         });
     }
@@ -646,11 +676,17 @@ public class GameController {
         alert.setOnCloseRequest(dialogEvent -> {
             ButtonType result = alert.getResult();
             if (result == playAgainButton) {
+                mainController.closeConnection();
                 mainController.showInputPage();
             } else if (result == returnButton) {
+                mainController.closeConnection();
                 mainController.showMainPage();
             } else if (result == exitButton) {
-                clientService.close();
+                mainController.closeConnection();
+                if (mainController.getUserId() != null) {
+                    OkHttpUtils.postForm("http://localhost:8080/user/logout",
+                            Map.of("userId", mainController.getUserId().toString()), null);
+                }
                 System.exit(0);
             }
         });
@@ -668,22 +704,125 @@ public class GameController {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("对手已离线");
-        alert.setHeaderText("对手已离线，游戏结束");
+        alert.setHeaderText("对手已离线，游戏结束！");
         alert.setContentText("请选择下一步操作：");
 
         ButtonType restartButton = new ButtonType("重新开始");
+        ButtonType returnButton = new ButtonType("返回主页");
         ButtonType exitButton = new ButtonType("退出游戏", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        alert.getButtonTypes().setAll(restartButton, exitButton);
+        alert.getButtonTypes().setAll(restartButton, returnButton, exitButton);
 
         // 处理用户选择
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == restartButton) {
             // 用户选择重新开始
+            mainController.closeConnection();
             mainController.showInputPage();
+        } else if (result.isPresent() && result.get() == returnButton) {
+            mainController.closeConnection();
+            mainController.showMainPage();
         } else {
+            mainController.closeConnection();
+            if (mainController.getUserId() != null) {
+                OkHttpUtils.postForm("http://localhost:8080/user/logout",
+                        Map.of("userId", mainController.getUserId().toString()), null);
+            }
             // 用户选择退出
             System.exit(0);
         }
+    }
+
+    private Alert reconnectDialog;
+    private Label countdownLabel;
+    private int countdownSeconds;
+    private boolean isReconnecting = false;
+
+    public void showReconnectDialog() {
+        if (timeline != null) {
+            timeline.stop();
+        }
+
+        // 创建一个警告类型的弹窗
+        reconnectDialog = new Alert(Alert.AlertType.INFORMATION);
+        reconnectDialog.setTitle("等待重连");
+        reconnectDialog.setHeaderText(null);
+        countdownSeconds = 30;
+        isReconnecting = true;
+
+        // 设置弹窗的内容：一个文本标签显示倒计时和重连提示
+        VBox vbox = new VBox();
+        Text reconnectText = new Text("对手掉线，正在等待重连...");
+        countdownLabel = new Label("剩余时间: " + countdownSeconds + "秒");
+        vbox.getChildren().addAll(reconnectText, countdownLabel);
+
+        reconnectDialog.getDialogPane().setContent(vbox);
+
+        reconnectDialog.getDialogPane().setHeaderText(null);  // 关闭掉默认的标题区域
+        reconnectDialog.getDialogPane().getScene().getWindow().setOpacity(1); // 保证正常透明度
+        reconnectDialog.getDialogPane().setStyle("-fx-background-color: white;");
+
+        startCountdown();
+
+        ButtonType restartButton = new ButtonType("重新开始");
+        ButtonType returnButton = new ButtonType("返回主页");
+        ButtonType exitButton = new ButtonType("退出游戏", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        reconnectDialog.getButtonTypes().setAll(restartButton, returnButton, exitButton);
+
+        if (!reconnectDialog.isShowing()) {
+            Optional<ButtonType> result = reconnectDialog.showAndWait();
+            if (result.isPresent() && result.get() == restartButton) {
+                mainController.closeConnection();
+                mainController.showInputPage();
+                clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
+            } else if (result.isPresent() && result.get() == returnButton) {
+                clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
+                isReconnecting = false;
+                mainController.closeConnection();
+                mainController.showMainPage();
+            } else {
+//                mainController.closeConnection();
+//                clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
+//                if (mainController.getUserId() != null) {
+//                    OkHttpUtils.postForm("http://localhost:8080/user/logout",
+//                            Map.of("userId", mainController.getUserId().toString()), null);
+//                }
+//                System.exit(0);
+            }
+        }
+    }
+
+    // 启动倒计时
+    private void startCountdown() {
+        Thread countdownThread = new Thread(() -> {
+            try {
+                while (countdownSeconds > 0) {
+                    TimeUnit.SECONDS.sleep(1);
+                    countdownSeconds--;
+                    Platform.runLater(() -> countdownLabel.setText("剩余时间: " + countdownSeconds + "秒"));
+                }
+                if (isReconnecting) {
+                    isReconnecting = false;
+                    clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
+                    Platform.runLater(() -> {
+                        {
+                            closeReconnectingDialog();
+                            showDisconnectedDialog();
+                        }
+                    });
+                }
+            } catch (InterruptedException e) {
+                log.error("倒计时线程被中断", e);
+            }
+        });
+
+        countdownThread.setDaemon(true);
+        countdownThread.start();
+    }
+
+    // 关闭等待重连弹窗
+    public void closeReconnectingDialog() {
+        reconnectDialog.close();
     }
 }

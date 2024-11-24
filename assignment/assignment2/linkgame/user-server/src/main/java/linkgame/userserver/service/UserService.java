@@ -4,6 +4,8 @@ import linkgame.userserver.result.Result;
 import linkgame.userserver.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Set;
+
 /**
 * @author W
 * @description 针对表【user】的数据库操作Service
@@ -11,7 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface UserService extends IService<User> {
 
-    Result<User> login(String username, String password);
+    Result<User> login(String username, String password, Set<Integer> users);
 
     Result<User> register(User user);
 }

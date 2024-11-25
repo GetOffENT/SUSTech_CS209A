@@ -6,6 +6,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import linkgame.common.Message;
 import linkgame.common.MessageType;
+import linkgame.common.OkHttpUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +33,8 @@ public class ClientService {
     private boolean isConnected = false;
     @Setter
     private boolean normalClose = false;
+    @Setter
+    private Integer userId;
 
     /**
      * 连接服务器
@@ -42,6 +45,7 @@ public class ClientService {
             String userId, String nickname, String avatar,
             Consumer<Message> messageHandler
     ) {
+        normalClose = false;
         new Thread(() -> {
             try {
                 socket = new Socket(host, port);
@@ -132,6 +136,10 @@ public class ClientService {
             alert.setContentText("请检查网络连接或稍后重试");
             alert.getButtonTypes().setAll(new ButtonType("退出游戏", ButtonBar.ButtonData.CANCEL_CLOSE));
             alert.showAndWait();
+            if (userId != null) {
+                OkHttpUtils.postForm("http://localhost:8080/user/logout",
+                        Map.of("userId", userId.toString()), null);
+            }
             System.exit(0);
         });
     }
@@ -144,6 +152,10 @@ public class ClientService {
             alert.setContentText("游戏将退出，请检查网络并重新连接。");
             alert.getButtonTypes().setAll(new ButtonType("退出游戏", ButtonBar.ButtonData.CANCEL_CLOSE));
             alert.showAndWait();
+            if (userId != null) {
+                OkHttpUtils.postForm("http://localhost:8080/user/logout",
+                        Map.of("userId", userId.toString()), null);
+            }
             System.exit(0);
         });
     }

@@ -113,6 +113,7 @@ public class GameServer {
                         String opponentId = (String) message.getData().get("opponentId");
                         opponent = pickingClients.get(opponentId);
                         pickingClients.remove(opponentId);
+                        pickingClients.remove(userId);
                         informPickList();
                         opponent.opponent = this;
                         handleInit();

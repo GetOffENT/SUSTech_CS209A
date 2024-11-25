@@ -343,6 +343,20 @@ public class GameController {
                 showGameOverDialog(yourScore, opponentScore);
             } else if (message.getType() == MessageType.WAIT_RECONNECT) {
                 showReconnectDialog();
+            } else if (message.getType() == MessageType.RESET) {
+                showResetDialog();
+            } else if (message.getType() == MessageType.RESET_TRUE) {
+                int[][] board = (int[][]) message.getData().get("board");
+                loadGameScene(board);
+                isYourTurn = (boolean) message.getData().get("turn");
+                showInformMessage("重置成功! " + (isYourTurn ? "你先手!" : "对手先手!"));
+                selectedButtons.clear();
+                opponentSelectedButtons.clear();
+                startTurnCountdown();
+            } else if (message.getType() == MessageType.RESET_FALSE) {
+                showMessage("对手拒绝重置!");
+            } else {
+                log.warn("未知消息类型: {}", message.getType());
             }
         });
     }
@@ -637,7 +651,8 @@ public class GameController {
     public static Image imageWatermelon = new Image(Objects.requireNonNull(GameController.class.getResource("/linkgame/client/watermelon.png")).toExternalForm());
 
     public void handleReset(ActionEvent actionEvent) {
-        System.out.println("Reset button clicked");
+        log.info("申请重置游戏");
+        clientService.sendMessage(new Message(MessageType.RESET, null));
     }
 
     private void showGameOverDialog(int yourScore, int opponentScore) {
@@ -826,5 +841,24 @@ public class GameController {
     // 关闭等待重连弹窗
     public void closeReconnectingDialog() {
         reconnectDialog.close();
+    }
+
+    public void showResetDialog() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("重置游戏");
+        alert.setHeaderText("对手请求重置棋盘，是否同意？");
+        alert.setContentText("重置后棋盘将随机重新生成");
+
+        ButtonType confirmButton = new ButtonType("同意", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType("拒绝", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(confirmButton, cancelButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == confirmButton) {
+            clientService.sendMessage(new Message(MessageType.RESET_TRUE, null));
+        } else {
+            clientService.sendMessage(new Message(MessageType.RESET_FALSE, null));
+        }
     }
 }

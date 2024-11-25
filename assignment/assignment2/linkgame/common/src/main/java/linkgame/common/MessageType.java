@@ -24,4 +24,7 @@ public enum MessageType {
     RECONNECT_FAIL,
     WAIT_RECONNECT,
     WAIT_RECONNECT_FAIL,
+    RESET,
+    RESET_TRUE,
+    RESET_FALSE,
 }

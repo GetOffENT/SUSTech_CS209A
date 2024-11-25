@@ -132,6 +132,12 @@ public class GameServer {
                             synchronized (errorClients) {
                                 errorClients.remove(userId);
                             }
+                        } else if (message.getType() == MessageType.RESET) {
+                            opponent.sendMessage(message);
+                        } else if (message.getType() == MessageType.RESET_TRUE) {
+                            handleReset();
+                        } else if (message.getType() == MessageType.RESET_FALSE) {
+                            opponent.sendMessage(message);
                         }
                     } else {
                         log.warn("{} 尚未匹配到对手", clientId);
@@ -165,7 +171,7 @@ public class GameServer {
                             "opponentScore", opponentScore,
                             "opponentNickname", opponent.nickname,
                             "opponentAvatar", opponent.avatar
-                            )
+                    )
             ));
             opponent.sendMessage(new Message(
                     MessageType.RECONNECT,
@@ -278,6 +284,29 @@ public class GameServer {
                 opponent.gameOver = true;
                 sendRecord();
             }
+        }
+
+        private void handleReset() throws IOException {
+            int row = sharedGame.board.length;
+            int col = sharedGame.board[0].length;
+
+            int[][] board;
+            do {
+                board = Game.SetupBoard(row, col, true);
+                sharedGame = new Game(board);
+            } while (sharedGame.isGameOver());
+            opponent.sharedGame = sharedGame;
+            sendMessage(new Message(
+                    MessageType.RESET_TRUE,
+                    Map.of("board", board,
+                            "turn", true)
+            ));
+            opponent.sendMessage(new Message(
+                    MessageType.RESET_TRUE,
+                    Map.of("board", board,
+                            "turn", false)
+            ));
+            log.info("已向 {} 和 {} 发送重置消息", clientId, opponent.clientId);
         }
 
         private void sendRecord() {

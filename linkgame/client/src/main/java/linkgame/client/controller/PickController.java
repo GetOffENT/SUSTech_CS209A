@@ -77,9 +77,9 @@ public class PickController {
             usersContainer.getChildren().add(userBox);
         }
 
-        if (usersContainer.getChildren().size() > 1) {
-            adjustWindowSize(usersContainer.getChildren().size());
-        }
+//        if (usersContainer.getChildren().size() > 1) {
+//            adjustWindowSize(usersContainer.getChildren().size());
+//        }
     }
 
     /**
@@ -142,10 +142,10 @@ public class PickController {
         return userBox;
     }
 
-    private void adjustWindowSize(int count) {
-        Stage stage = (Stage) usersContainer.getScene().getWindow();
-        stage.setHeight(200 + 40 * count);
-    }
+//    private void adjustWindowSize(int count) {
+//        Stage stage = (Stage) usersContainer.getScene().getWindow();
+//        stage.setHeight(200 + 40 * count);
+//    }
 
     private void connectToUser(String userId) {
         mainController.connectToUser(userId);

@@ -10,7 +10,7 @@
     <Label text="挑选对手..." style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3c3c3c;"/>
 
     <!-- 用户列表显示区域 -->
-    <VBox fx:id="usersContainer" spacing="10"/>
+    <VBox fx:id="usersContainer" spacing="10" prefHeight="250" style="-fx-padding: 10;"/>
 
     <!-- 提示文字 -->
     <Label text="请挑选您的对手，或者等待其他人选择您"

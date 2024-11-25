@@ -108,7 +108,7 @@ public class MainController {
             waitingController.setMainController(this);
             waitingScene = new Scene(waitingRoot);
 
-            // 预加载 ClientController
+            // 预加载 GameController
             FXMLLoader gameLoader = new FXMLLoader(getClass().getResource("GamePage.fxml"));
             gameRoot = gameLoader.load();
             gameController = gameLoader.getController();
@@ -141,6 +141,7 @@ public class MainController {
     }
 
     public void showMainPage(int userId, String nickname, String avatar) {
+        gameController.getClientService().setUserId(userId);
         this.userId = userId;
         this.nickname = nickname;
         this.avatar = avatar;

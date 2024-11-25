@@ -33,7 +33,6 @@ public class PickController {
 
     @FXML
     public void backToMainPage() {
-        mainController.closeConnection();
         mainController.showMainPage();
     }
 

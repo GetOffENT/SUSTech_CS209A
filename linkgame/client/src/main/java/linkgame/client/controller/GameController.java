@@ -268,7 +268,6 @@ public class GameController {
                 }
                 startTurnCountdown();
             } else if (message.getType() == MessageType.RECONNECT_FAIL) {
-                mainController.closeConnection();
                 mainController.showMainPage();
             } else if (message.getType() == MessageType.INIT) {
                 int[][] board = (int[][]) message.getData().get("board");
@@ -691,10 +690,8 @@ public class GameController {
         alert.setOnCloseRequest(dialogEvent -> {
             ButtonType result = alert.getResult();
             if (result == playAgainButton) {
-                mainController.closeConnection();
                 mainController.showInputPage();
             } else if (result == returnButton) {
-                mainController.closeConnection();
                 mainController.showMainPage();
             } else if (result == exitButton) {
                 mainController.closeConnection();
@@ -732,10 +729,8 @@ public class GameController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == restartButton) {
             // 用户选择重新开始
-            mainController.closeConnection();
             mainController.showInputPage();
         } else if (result.isPresent() && result.get() == returnButton) {
-            mainController.closeConnection();
             mainController.showMainPage();
         } else {
             mainController.closeConnection();
@@ -790,12 +785,10 @@ public class GameController {
         if (result.isPresent() && result.get() == restartButton) {
             clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
             isReconnecting = false;
-            mainController.closeConnection();
             mainController.showInputPage();
         } else if (result.isPresent() && result.get() == returnButton) {
             clientService.sendMessage(new Message(MessageType.WAIT_RECONNECT_FAIL, null));
             isReconnecting = false;
-            mainController.closeConnection();
             mainController.showMainPage();
         } else {
             if (isReconnecting) {

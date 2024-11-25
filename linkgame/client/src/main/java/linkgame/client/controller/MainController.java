@@ -113,7 +113,7 @@ public class MainController {
             gameRoot = gameLoader.load();
             gameController = gameLoader.getController();
             gameController.setMainController(this);
-            gameController.setClientService(new ClientService());
+            gameController.setClientService(new ClientService(this));
             gameScene = new Scene(gameRoot);
 
             // 设置初始页面为登录页面
@@ -135,6 +135,7 @@ public class MainController {
     }
 
     public void showMainPage() {
+        closeConnection();
         mainPageController.loadAllUsers();
         stage.setScene(mainPageScene);
         stage.setTitle("主页");
@@ -152,6 +153,7 @@ public class MainController {
     }
 
     public void showInputPage() {
+        closeConnection();
         stage.setScene(inputScene);
         stage.setTitle("棋盘大小");
     }

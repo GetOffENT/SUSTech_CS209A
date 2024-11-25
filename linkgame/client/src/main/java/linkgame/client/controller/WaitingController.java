@@ -17,7 +17,6 @@ public class WaitingController {
 
     @FXML
     public void backToMainPage() {
-        mainController.closeConnection();
         mainController.showMainPage();
     }
 }

@@ -1,0 +1,3 @@
+[submodule "project/StackOverflow-Java-Analysis"]
+	path = project/StackOverflow-Java-Analysis
+	url = https://github.com/GetOffENT/StackOverflow-Java-Analysis.git
